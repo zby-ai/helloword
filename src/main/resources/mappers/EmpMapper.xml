@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.ssm.mapping.EmpMapper">
+  <resultMap id="BaseResultMap" type="com.atguigu.ssm.bean.Emp">
+    <id column="e_id" jdbcType="INTEGER" property="eId" />
+    <result column="e_name" jdbcType="VARCHAR" property="eName" />
+    <result column="e_email" jdbcType="VARCHAR" property="eEmail" />
+    <result column="e_age"  property="eAge" />
+    <result column="e_sax" jdbcType="CHAR" property="eSax" />
+    <result column="d_id" jdbcType="INTEGER" property="dId" />
+    <association property="dep" javaType="com.atguigu.ssm.bean.Dep">
+        <id column="d_id" property="dId"/>
+        <result column="d_name" property="dName"/>
+    </association>
+  </resultMap>
+  <delete id="deleteByPrimaryKey" >
+    delete from tb_emp
+    where e_id = #{eId}
+  </delete>
+  <insert id="insert" parameterType="com.atguigu.ssm.bean.Emp">
+    insert into tb_emp (e_id, e_name, e_email,e_age,
+      e_sax, d_id)
+    values (#{eId,jdbcType=INTEGER}, #{eName,jdbcType=VARCHAR},#{eEmail,jdbcType=VARCHAR}, #{eAge,jdbcType=INTEGER},
+      #{eSax,jdbcType=CHAR}, #{dId,jdbcType=INTEGER})
+  </insert>
+<!--  int updateByPrimaryKey(Emp record);-->
+  <update id="updateByPrimaryKey" parameterType="com.atguigu.ssm.bean.Emp">
+    update tb_emp
+    <trim prefix="set" suffixOverrides="," >
+      <if test="eName != null and eName.trim() !='' ">
+        e_name = #{eName,jdbcType=VARCHAR},
+      </if>
+      <if test="eEmail != null and eEmail.trim() !='' ">
+        e_email = #{eEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="eAge != null and eAge.trim() !='' ">
+        e_age = #{eAge},
+      </if>
+      <if test="eSax != null and eSax.trim() !='' ">
+        e_sax = #{eSax,jdbcType=CHAR},
+      </if>
+      <if test="dId != null">
+        d_id = #{dId,jdbcType=INTEGER}
+      </if>
+    </trim>
+    where e_id = #{eId,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey"  resultMap="BaseResultMap">
+    select e_id, e_name,e_email, e_age, e_sax, d_id
+    from tb_emp
+    where e_id = #{eId,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select e.e_id, e.e_name,e.e_email, e.e_age, e_sax, e.d_id,d.d_name
+    from tb_emp e
+    left join tb_dep d
+    on e.d_id = d.d_id
+  </select>
+<!--  void updateEmailById(Integer eid,String email);-->
+  <update id="updateEmailById">
+    update tb_emp set e_email = #{email} where e_id = #{eid}
+  </update>
+<!--  Emp queryEmpName(String eName);-->
+  <select id="queryEmpName" resultType="String">
+    select e_name from tb_emp where e_name = #{ename}
+  </select>
+<!--void deleteBatchEmp(@Param("ids") String[] ids);-->
+  <delete id="deleteBatchEmp" >
+    delete from tb_emp where
+    e_id in
+    <foreach collection="ids" item="id" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+  </delete>
+</mapper>
